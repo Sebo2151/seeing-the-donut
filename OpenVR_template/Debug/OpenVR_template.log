@@ -1,0 +1,24 @@
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(452,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (OpenVR_template.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  EllipticCurve.cpp
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,90): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,90): warning C4244:         with
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,90): warning C4244:         [
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,90): warning C4244:             _Ty=double
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,90): warning C4244:         ]
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,74): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,74): warning C4244:         with
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,74): warning C4244:         [
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,74): warning C4244:             _Ty=double
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,74): warning C4244:         ]
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,58): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,58): warning C4244:         with
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,58): warning C4244:         [
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,58): warning C4244:             _Ty=double
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,58): warning C4244:         ]
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,48): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,48): warning C4244:         with
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,48): warning C4244:         [
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,48): warning C4244:             _Ty=double
+C:\Users\sebby\Documents\seeing_the_donut\OpenVR_template\EllipticCurve.cpp(100,48): warning C4244:         ]
+EllipticCurve.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
+  OpenVR_template.vcxproj -> C:\Users\sebby\Documents\seeing_the_donut\Debug\Donut.exe

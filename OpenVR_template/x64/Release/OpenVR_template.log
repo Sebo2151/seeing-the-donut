@@ -1,0 +1,6 @@
+﻿  hellovr_opengl_main.cpp
+  lodepng.cpp
+  Matrices.cpp
+  pathtools.cpp
+  strtools.cpp
+C:\Users\Sebastian\Documents\openvr_template\OpenVR_template\hellovr_opengl_main.cpp(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory

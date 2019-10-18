@@ -1,0 +1,10 @@
+﻿  hellovr_opengl_main.cpp
+  lodepng.cpp
+  Matrices.cpp
+  pathtools.cpp
+  strtools.cpp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 900 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  OpenVR_template.vcxproj -> C:\Users\Sebastian\Documents\openvr_template\Release\OpenVR_template.exe
