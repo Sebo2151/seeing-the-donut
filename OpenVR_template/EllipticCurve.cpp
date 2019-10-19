@@ -1,6 +1,7 @@
 #include "EllipticCurve.h"
 
 #include <cmath>
+#include "misc_util.h"
 
 typedef  std::complex<double> C;
 
@@ -67,8 +68,6 @@ C weierstrass_p_derivative(C z, C tau)
 	return sum;
 }
 
-
-
 EllipticCurve::EllipticCurve()
 {
 
@@ -76,7 +75,7 @@ EllipticCurve::EllipticCurve()
 	rotation.identity();
 
 	init_mesh();
-	init_shaders();
+	init_gl_info();
 }
 
 void EllipticCurve::Draw()
@@ -119,6 +118,48 @@ void EllipticCurve::init_mesh()
 	}
 }
 
-void EllipticCurve::init_shaders()
+void EllipticCurve::init_gl_info()
 {
+	gl_program_handle = CompileGLShader(
+		"EllipticCurve",
+
+		"#version 410\n"
+		"uniform mat4 matrix;\n"
+		"layout(location = 0) in vec4 position;\n"
+		"layout(location = 1) in float color_param_in;\n"
+		"layout(location = 2) in vec3 normal_in;\n"
+		"out float color_param;\n"
+		"out vec3 normal;\n"
+		"void main()\n"
+		"{\n"
+		"    color_param = color_param_in;\n"
+		"    normal = normal_in;\n"
+		"    gl_Position = matrix * position;\n"
+		"}\n",
+
+		"#version 410 core\n"
+		"in float color_param;\n"
+		"in vec3 normal;\n"
+		"out vec3 output_color;\n"
+		"void main()\n"
+		"{\n"
+		"   output_color = (color_param * vec3(83.0f/255.0f, 236.0f/255.0f, 210.0f/255.0f)"
+		"                   + (1 - color_param) * vec3(49.0f/255.0f, 124.0f/255.0f, 238.0f/255.0f))"
+		"                * (abs(dot(normal, vec3(.577,.577,.577))));\n"
+		"}\n"
+	);
+
+	if (gl_program_handle == 0)
+	{
+		dprintf("Fuck. Elliptic curve shader didn't compile.\n");
+	}
+
+	gl_matrix_location = glGetUniformLocation(gl_program_handle, "matrix");
+
+	if (gl_matrix_location)
+	{
+		dprintf("The elliptic curve uniform matrix location is fucked.\n");
+	}
+
+
 }

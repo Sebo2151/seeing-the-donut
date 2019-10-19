@@ -34,6 +34,9 @@
 #define _countof(x) (sizeof(x)/sizeof((x)[0]))
 #endif
 
+#include "misc_util.h"
+#include "EllipticCurve.h"
+
 void ThreadSleep( unsigned long nMilliseconds )
 {
 #if defined(_WIN32)
@@ -63,7 +66,7 @@ private:
 	std::string m_sModelName;
 };
 
-static bool g_bPrintf = true;
+
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -108,7 +111,6 @@ public:
 
 	Matrix4 ConvertSteamVRMatrixToMatrix4( const vr::HmdMatrix34_t &matPose );
 
-	GLuint CompileGLShader( const char *pchShaderName, const char *pchVertexShader, const char *pchFragmentShader );
 	bool CreateAllShaders();
 
 	CGLRenderModel *FindOrLoadRenderModel( const char *pchRenderModelName );
@@ -237,101 +239,9 @@ private: // OpenGL bookkeeping
 
 	std::vector< CGLRenderModel * > m_vecRenderModels;
 
-	vr::VRActionHandle_t m_actionHideCubes = vr::k_ulInvalidActionHandle;
-	vr::VRActionHandle_t m_actionHideThisController = vr::k_ulInvalidActionHandle;
-	vr::VRActionHandle_t m_actionTriggerHaptic = vr::k_ulInvalidActionHandle;
-	vr::VRActionHandle_t m_actionAnalongInput = vr::k_ulInvalidActionHandle;
-
-	vr::VRActionSetHandle_t m_actionsetDemo = vr::k_ulInvalidActionSetHandle;
+	EllipticCurve* ec = 0;
 };
 
-
-//---------------------------------------------------------------------------------------------------------------------
-// Purpose: Returns true if the action is active and had a rising edge
-//---------------------------------------------------------------------------------------------------------------------
-bool GetDigitalActionRisingEdge(vr::VRActionHandle_t action, vr::VRInputValueHandle_t *pDevicePath = nullptr )
-{
-	vr::InputDigitalActionData_t actionData;
-	vr::VRInput()->GetDigitalActionData(action, &actionData, sizeof(actionData), vr::k_ulInvalidInputValueHandle );
-	if (pDevicePath)
-	{
-		*pDevicePath = vr::k_ulInvalidInputValueHandle;
-		if (actionData.bActive)
-		{
-			vr::InputOriginInfo_t originInfo;
-			if (vr::VRInputError_None == vr::VRInput()->GetOriginTrackedDeviceInfo(actionData.activeOrigin, &originInfo, sizeof(originInfo)))
-			{
-				*pDevicePath = originInfo.devicePath;
-			}
-		}
-	}
-	return actionData.bActive && actionData.bChanged && actionData.bState;
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-// Purpose: Returns true if the action is active and had a falling edge
-//---------------------------------------------------------------------------------------------------------------------
-bool GetDigitalActionFallingEdge(vr::VRActionHandle_t action, vr::VRInputValueHandle_t *pDevicePath = nullptr )
-{
-	vr::InputDigitalActionData_t actionData;
-	vr::VRInput()->GetDigitalActionData(action, &actionData, sizeof(actionData), vr::k_ulInvalidInputValueHandle );
-	if (pDevicePath)
-	{
-		*pDevicePath = vr::k_ulInvalidInputValueHandle;
-		if (actionData.bActive)
-		{
-			vr::InputOriginInfo_t originInfo;
-			if (vr::VRInputError_None == vr::VRInput()->GetOriginTrackedDeviceInfo(actionData.activeOrigin, &originInfo, sizeof(originInfo)))
-			{
-				*pDevicePath = originInfo.devicePath;
-			}
-		}
-	}
-	return actionData.bActive && actionData.bChanged && !actionData.bState;
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------
-// Purpose: Returns true if the action is active and its state is true
-//---------------------------------------------------------------------------------------------------------------------
-bool GetDigitalActionState(vr::VRActionHandle_t action, vr::VRInputValueHandle_t *pDevicePath = nullptr )
-{
-	vr::InputDigitalActionData_t actionData;
-	vr::VRInput()->GetDigitalActionData(action, &actionData, sizeof(actionData), vr::k_ulInvalidInputValueHandle );
-	if (pDevicePath)
-	{
-		*pDevicePath = vr::k_ulInvalidInputValueHandle;
-		if (actionData.bActive)
-		{
-			vr::InputOriginInfo_t originInfo;
-			if (vr::VRInputError_None == vr::VRInput()->GetOriginTrackedDeviceInfo(actionData.activeOrigin, &originInfo, sizeof(originInfo)))
-			{
-				*pDevicePath = originInfo.devicePath;
-			}
-		}
-	}
-	return actionData.bActive && actionData.bState;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Outputs a set of optional arguments to debugging output, using
-//          the printf format setting specified in fmt*.
-//-----------------------------------------------------------------------------
-void dprintf( const char *fmt, ... )
-{
-	va_list args;
-	char buffer[ 2048 ];
-
-	va_start( args, fmt );
-	vsprintf_s( buffer, fmt, args );
-	va_end( args );
-
-	if ( g_bPrintf )
-		printf( "%s", buffer );
-
-	OutputDebugStringA( buffer );
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
@@ -534,23 +444,6 @@ bool CMainApplication::BInit()
 		return false;
 	}
 
-	vr::VRInput()->SetActionManifestPath( Path_MakeAbsolute( "../hellovr_actions.json", Path_StripFilename( Path_GetExecutablePath() ) ).c_str() );
-
-	vr::VRInput()->GetActionHandle( "/actions/demo/in/HideCubes", &m_actionHideCubes );
-	vr::VRInput()->GetActionHandle( "/actions/demo/in/HideThisController", &m_actionHideThisController);
-	vr::VRInput()->GetActionHandle( "/actions/demo/in/TriggerHaptic", &m_actionTriggerHaptic );
-	vr::VRInput()->GetActionHandle( "/actions/demo/in/AnalogInput", &m_actionAnalongInput );
-
-	vr::VRInput()->GetActionSetHandle( "/actions/demo", &m_actionsetDemo );
-
-	vr::VRInput()->GetActionHandle( "/actions/demo/out/Haptic_Left", &m_rHand[Left].m_actionHaptic );
-	vr::VRInput()->GetInputSourceHandle( "/user/hand/left", &m_rHand[Left].m_source );
-	vr::VRInput()->GetActionHandle( "/actions/demo/in/Hand_Left", &m_rHand[Left].m_actionPose );
-
-	vr::VRInput()->GetActionHandle( "/actions/demo/out/Haptic_Right", &m_rHand[Right].m_actionHaptic );
-	vr::VRInput()->GetInputSourceHandle( "/user/hand/right", &m_rHand[Right].m_source );
-	vr::VRInput()->GetActionHandle( "/actions/demo/in/Hand_Right", &m_rHand[Right].m_actionPose );
-
 	return true;
 }
 
@@ -688,6 +581,11 @@ void CMainApplication::Shutdown()
 	}
 
 	SDL_Quit();
+
+	if (ec)
+	{
+		delete ec;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -725,76 +623,6 @@ bool CMainApplication::HandleInput()
 		ProcessVREvent( event );
 	}
 
-	// Process SteamVR action state
-	// UpdateActionState is called each frame to update the state of the actions themselves. The application
-	// controls which action sets are active with the provided array of VRActiveActionSet_t structs.
-	vr::VRActiveActionSet_t actionSet = { 0 };
-	actionSet.ulActionSet = m_actionsetDemo;
-	vr::VRInput()->UpdateActionState( &actionSet, sizeof(actionSet), 1 );
-
-	m_bShowCubes = !GetDigitalActionState( m_actionHideCubes );
-
-	vr::VRInputValueHandle_t ulHapticDevice;
-	if ( GetDigitalActionRisingEdge( m_actionTriggerHaptic, &ulHapticDevice ) )
-	{
-		if ( ulHapticDevice == m_rHand[Left].m_source )
-		{
-			vr::VRInput()->TriggerHapticVibrationAction( m_rHand[Left].m_actionHaptic, 0, 1, 4.f, 1.0f, vr::k_ulInvalidInputValueHandle );
-		}
-		if ( ulHapticDevice == m_rHand[Right].m_source )
-		{
-			vr::VRInput()->TriggerHapticVibrationAction( m_rHand[Right].m_actionHaptic, 0, 1, 4.f, 1.0f, vr::k_ulInvalidInputValueHandle );
-		}
-	}
-
-	vr::InputAnalogActionData_t analogData;
-	if ( vr::VRInput()->GetAnalogActionData( m_actionAnalongInput, &analogData, sizeof( analogData ), vr::k_ulInvalidInputValueHandle ) == vr::VRInputError_None && analogData.bActive )
-	{
-		m_vAnalogValue[0] = analogData.x;
-		m_vAnalogValue[1] = analogData.y;
-	}
-
-	m_rHand[Left].m_bShowController = true;
-	m_rHand[Right].m_bShowController = true;
-
-	vr::VRInputValueHandle_t ulHideDevice;
-	if ( GetDigitalActionState( m_actionHideThisController, &ulHideDevice ) )
-	{
-		if ( ulHideDevice == m_rHand[Left].m_source )
-		{
-			m_rHand[Left].m_bShowController = false;
-		}
-		if ( ulHideDevice == m_rHand[Right].m_source )
-		{
-			m_rHand[Right].m_bShowController = false;
-		}
-	}
-
-	for ( EHand eHand = Left; eHand <= Right; ((int&)eHand)++ )
-	{
-		vr::InputPoseActionData_t poseData;
-		if ( vr::VRInput()->GetPoseActionDataForNextFrame( m_rHand[eHand].m_actionPose, vr::TrackingUniverseStanding, &poseData, sizeof( poseData ), vr::k_ulInvalidInputValueHandle ) != vr::VRInputError_None
-			|| !poseData.bActive || !poseData.pose.bPoseIsValid )
-		{
-			m_rHand[eHand].m_bShowController = false;
-		}
-		else
-		{
-			m_rHand[eHand].m_rmat4Pose = ConvertSteamVRMatrixToMatrix4( poseData.pose.mDeviceToAbsoluteTracking );
-
-			vr::InputOriginInfo_t originInfo;
-			if ( vr::VRInput()->GetOriginTrackedDeviceInfo( poseData.activeOrigin, &originInfo, sizeof( originInfo ) ) == vr::VRInputError_None 
-				&& originInfo.trackedDeviceIndex != vr::k_unTrackedDeviceIndexInvalid )
-			{
-				std::string sRenderModelName = GetTrackedDeviceString( originInfo.trackedDeviceIndex, vr::Prop_RenderModelName_String );
-				if ( sRenderModelName != m_rHand[eHand].m_sRenderModelName )
-				{
-					m_rHand[eHand].m_pRenderModel = FindOrLoadRenderModel( sRenderModelName.c_str() );
-					m_rHand[eHand].m_sRenderModelName = sRenderModelName;
-				}
-			}
-		}
-	}
 
 	return bRet;
 }
@@ -901,63 +729,7 @@ void CMainApplication::RenderFrame()
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: Compiles a GL shader program and returns the handle. Returns 0 if
-//			the shader couldn't be compiled for some reason.
-//-----------------------------------------------------------------------------
-GLuint CMainApplication::CompileGLShader( const char *pchShaderName, const char *pchVertexShader, const char *pchFragmentShader )
-{
-	GLuint unProgramID = glCreateProgram();
 
-	GLuint nSceneVertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource( nSceneVertexShader, 1, &pchVertexShader, NULL);
-	glCompileShader( nSceneVertexShader );
-
-	GLint vShaderCompiled = GL_FALSE;
-	glGetShaderiv( nSceneVertexShader, GL_COMPILE_STATUS, &vShaderCompiled);
-	if ( vShaderCompiled != GL_TRUE)
-	{
-		dprintf("%s - Unable to compile vertex shader %d!\n", pchShaderName, nSceneVertexShader);
-		glDeleteProgram( unProgramID );
-		glDeleteShader( nSceneVertexShader );
-		return 0;
-	}
-	glAttachShader( unProgramID, nSceneVertexShader);
-	glDeleteShader( nSceneVertexShader ); // the program hangs onto this once it's attached
-
-	GLuint  nSceneFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource( nSceneFragmentShader, 1, &pchFragmentShader, NULL);
-	glCompileShader( nSceneFragmentShader );
-
-	GLint fShaderCompiled = GL_FALSE;
-	glGetShaderiv( nSceneFragmentShader, GL_COMPILE_STATUS, &fShaderCompiled);
-	if (fShaderCompiled != GL_TRUE)
-	{
-		dprintf("%s - Unable to compile fragment shader %d!\n", pchShaderName, nSceneFragmentShader );
-		glDeleteProgram( unProgramID );
-		glDeleteShader( nSceneFragmentShader );
-		return 0;	
-	}
-
-	glAttachShader( unProgramID, nSceneFragmentShader );
-	glDeleteShader( nSceneFragmentShader ); // the program hangs onto this once it's attached
-
-	glLinkProgram( unProgramID );
-
-	GLint programSuccess = GL_TRUE;
-	glGetProgramiv( unProgramID, GL_LINK_STATUS, &programSuccess);
-	if ( programSuccess != GL_TRUE )
-	{
-		dprintf("%s - Error linking program %d!\n", pchShaderName, unProgramID);
-		glDeleteProgram( unProgramID );
-		return 0;
-	}
-
-	glUseProgram( unProgramID );
-	glUseProgram( 0 );
-
-	return unProgramID;
-}
 
 
 //-----------------------------------------------------------------------------
@@ -1189,6 +961,8 @@ void CMainApplication::SetupScene()
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 
+
+	ec = new EllipticCurve();
 }
 
 

@@ -31,14 +31,17 @@ private:
 	Matrix4 rotation;
 	
 	// GL data
-	GLuint vert_shader_handle;
-	GLuint frag_shader_handle;
+	GLuint gl_program_handle = 0;
+	GLuint gl_matrix_location = 0;
+
+	GLuint gl_vert_buffer_handle = 0;
+	GLuint gl_index_buffer_handle = 0;
+	GLuint gl_VAO_handle = 0;
 
 	// TO DO: GL buffers
 
-
 	void init_mesh();
-	void init_shaders();
+	void init_gl_info();
 
 };
 

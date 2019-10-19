@@ -140,6 +140,7 @@
   <ItemGroup>
     <ClCompile Include="EllipticCurve.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="misc_util.cpp" />
     <ClCompile Include="Quat.cpp" />
     <ClCompile Include="util\lodepng.cpp" />
     <ClCompile Include="util\Matrices.cpp" />
@@ -148,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EllipticCurve.h" />
+    <ClInclude Include="misc_util.h" />
     <ClInclude Include="Quat.h" />
     <ClInclude Include="util\compat.h" />
     <ClInclude Include="util\lodepng.h" />
