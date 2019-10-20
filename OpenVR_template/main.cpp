@@ -962,7 +962,7 @@ void CMainApplication::SetupScene()
 	glDisableVertexAttribArray(1);
 
 
-	ec = new EllipticCurve();
+	ec = new EllipticCurve(); // Constructor does its own initialization.
 }
 
 
@@ -1313,6 +1313,7 @@ void CMainApplication::RenderScene( vr::Hmd_Eye nEye )
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
+	/*
 	if( m_bShowCubes )
 	{
 		glUseProgram( m_unSceneProgramID );
@@ -1322,7 +1323,7 @@ void CMainApplication::RenderScene( vr::Hmd_Eye nEye )
 		glDrawArrays( GL_TRIANGLES, 0, m_uiVertcount );
 		glBindVertexArray( 0 );
 	}
-
+	*/
 	bool bIsInputAvailable = m_pHMD->IsInputAvailable();
 
 	if( bIsInputAvailable )
@@ -1351,6 +1352,8 @@ void CMainApplication::RenderScene( vr::Hmd_Eye nEye )
 	}
 
 	glUseProgram( 0 );
+
+	ec->Draw(GetCurrentViewProjectionMatrix(nEye));
 }
 
 

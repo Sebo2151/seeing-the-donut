@@ -15,7 +15,7 @@ class EllipticCurve
 public:
 	EllipticCurve();
 
-	void Draw();
+	void Draw(Matrix4 projection);
 
 private:
 	// Computational data
@@ -25,7 +25,7 @@ private:
 	std::complex<float> tau;
 
 	std::vector<Vector4> untransformed_verts;
-	std::vector<int> indices;
+	std::vector<unsigned int> indices;
 
 	Vector4 translation;
 	Matrix4 rotation;
@@ -34,7 +34,7 @@ private:
 	GLuint gl_program_handle = 0;
 	GLuint gl_matrix_location = 0;
 
-	GLuint gl_vert_buffer_handle = 0;
+	GLuint gl_vert_data_buffer_handle = 0;
 	GLuint gl_index_buffer_handle = 0;
 	GLuint gl_VAO_handle = 0;
 
