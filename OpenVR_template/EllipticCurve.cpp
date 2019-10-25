@@ -14,7 +14,7 @@ C theta(C z, C tau)
 {
 	C sum = 1;
 	C nome = std::exp(pi * ii * tau);
-	const int term_bound = 30;
+	const int term_bound = 5;
 	for (int n = 1; n <= term_bound; n++)
 	{
 		sum += 2.0 * pow(nome, n * n) * cos(2 * pi * n * z);
@@ -57,7 +57,7 @@ C weierstrass_p_derivative(C z, C tau)
 {
 	C sum = 0;
 
-	const int sum_bounds = 30;
+	const int sum_bounds = 10;
 	for (int m = -sum_bounds; m <= sum_bounds; m++)
 	{
 		for (int n = -sum_bounds; n <= sum_bounds; n++)
@@ -76,19 +76,8 @@ EllipticCurve::EllipticCurve()
 	translation = Vector4(0, 0, 0, 0);
 	rotation.identity();
 
-	C test = weierstrass_p(C(0.5, 0.5), C(0, 1));
-	dprintf("weierstrass test: %f + %fi\n", test.real(), test.imag());
-	C test2 = theta(C(0, 1), C(0, 1));
-	dprintf("theta(i;i) test: %f + %fi\n", test2.real(), test2.imag());
-	C test3 = theta_10(0, C(0, 1));
-	dprintf("theta_10(0;i) test: %f + %fi\n", test3.real(), test3.imag());
-	C test4 = theta_01(C(0,1), C(0, 1));
-	dprintf("theta_01(i;i) test: %f + %fi\n", test4.real(), test4.imag());
-	C test5 = theta_11(C(0,1), C(0, 1));
-	dprintf("theta_11(i;i) test: %f + %fi\n", test4.real(), test4.imag());
-	
-	init_mesh();
 	init_gl_info();
+	init_mesh();
 }
 
 void EllipticCurve::Draw(Matrix4 projection)
@@ -104,9 +93,9 @@ void EllipticCurve::Draw(Matrix4 projection)
 		Vector4 transformed_vert = rotation * untransformed_verts[i] + translation;
 
 		// Only copy 3 coords to project away a coordinate (namely, im(x), if no transformation done yet.)
-		vert_data.push_back(transformed_vert.x);
-		vert_data.push_back(transformed_vert.y);
-		vert_data.push_back(transformed_vert.z);
+		vert_data.push_back(transformed_vert.x/2);
+		vert_data.push_back(transformed_vert.z/2);
+		vert_data.push_back(transformed_vert.w/2);
 		
 
 		// Next is the color parameter, a # between 0 and 1 used for coloring.
@@ -124,9 +113,9 @@ void EllipticCurve::Draw(Matrix4 projection)
 		Vector4 v_up = rotation * untransformed_verts[this_m + next_n * grid_num_rows] + translation;
 		Vector4 v_right = rotation * untransformed_verts[next_m + next_n * grid_num_rows] + translation;
 
-		Vector3 v_up_3 = Vector3(v_up.x, v_up.y, v_up.z);
-		Vector3 v_right_3 = Vector3(v_right.x, v_right.y, v_right.z);
-		Vector3 v_3 = Vector3(transformed_vert.x, transformed_vert.y, transformed_vert.z);
+		Vector3 v_up_3 = Vector3(v_up.x, v_up.z, v_up.w);
+		Vector3 v_right_3 = Vector3(v_right.x, v_right.z, v_right.w);
+		Vector3 v_3 = Vector3(transformed_vert.x, transformed_vert.z, transformed_vert.w);
 
 		Vector3 normal = v_right_3 - v_3;
 		normal = normal.cross(v_up_3 - v_3);
@@ -136,6 +125,8 @@ void EllipticCurve::Draw(Matrix4 projection)
 		vert_data.push_back(normal.y);
 		vert_data.push_back(normal.z);
 	}
+
+	const float cutoff_len = 30.0f;
 
 	for (int m = 0; m < grid_num_cols; m++)
 	{
@@ -150,14 +141,14 @@ void EllipticCurve::Draw(Matrix4 projection)
 				tvs[k] = Vector3(tv.x, tv.y, tv.z);
 			}
 
-			if ((tvs[0] - tvs[1]).length() < 4 && (tvs[2] - tvs[1]).length() < 4 && (tvs[2] - tvs[0]).length() < 4)
+			if ((tvs[0] - tvs[1]).length() < cutoff_len && (tvs[2] - tvs[1]).length() < cutoff_len && (tvs[2] - tvs[0]).length() < cutoff_len)
 			{
 				good_indices.push_back(indices[i]);
 				good_indices.push_back(indices[i + 1]);
 				good_indices.push_back(indices[i + 2]);
 			}
 
-			if ((tvs[3] - tvs[4]).length() < 4 && (tvs[5] - tvs[4]).length() < 4 && (tvs[5] - tvs[3]).length() < 4)
+			if ((tvs[3] - tvs[4]).length() < cutoff_len && (tvs[5] - tvs[4]).length() < cutoff_len && (tvs[5] - tvs[3]).length() < cutoff_len)
 			{
 				good_indices.push_back(indices[i + 3]);
 				good_indices.push_back(indices[i + 4]);
@@ -190,7 +181,7 @@ void EllipticCurve::Draw(Matrix4 projection)
 
 void EllipticCurve::init_mesh()
 {
-	C tau = C(0, 1.3);
+	C tau = C(0, 1);
 
 	// Compute the vertices!
 	for (int i = 0; i < grid_num_cols; i++)
@@ -242,7 +233,7 @@ void EllipticCurve::init_gl_info()
 		"{\n"
 		"    color_param = color_param_in;\n"
 		"    normal = normal_in;\n"
-		"    gl_Position = matrix * vec4(normal_in.x, normal_in.y, normal_in.z, 1);\n"
+		"    gl_Position = matrix * vec4(position, 1);\n"
 		"}\n",
 
 		"#version 410 core\n"
@@ -251,12 +242,11 @@ void EllipticCurve::init_gl_info()
 		"out vec3 output_color;\n"
 		"void main()\n"
 		"{\n"
-		"   vec3 normal2 = normalize(normal);\n"
-		"   vec3 light_dir = normalize(vec3(3,2,1));\n"
-		//"   output_color = (color_param * vec3(83.0f/255.0f, 236.0f/255.0f, 210.0f/255.0f)"
-		//"                   + (1 - color_param) * vec3(49.0f/255.0f, 124.0f/255.0f, 238.0f/255.0f))"
-		//"                * (abs(dot(normal2, light_dir)));\n"
-		"   output_color = normal;\n"
+		"   vec3 light1_dir = normalize(vec3(3,2,1));\n"
+		"   vec3 light2_dir = normalize(vec3(-1, -1, 0));\n"
+		"   vec3 diffuse = (color_param * vec3(247.0f/255.0f, 101.0f/255.0f, 15.0f/255.0f)\n"
+		"                   + (1 - color_param) * vec3(31.0f/255.0f, 38.0f/255.0f, 244.0f/255.0f));\n"
+		"   output_color = diffuse * ( max(0, dot(normal, light1_dir)) + max(0, 0.5f * dot(normal, light2_dir)));\n"
 		"}\n"
 	);
 
@@ -281,16 +271,15 @@ void EllipticCurve::init_gl_info()
 	glBindBuffer(GL_ARRAY_BUFFER, gl_vert_data_buffer_handle);
 
 	GLsizei stride = sizeof(float) * (3 + 1 + 3); // vertex + color param + normal
-	uintptr_t offset = 0;
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (const void*)offset);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, stride, (const void*)offset);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, stride, (const void*)(sizeof(float)*3));
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (const void*)offset);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (const void*)(sizeof(float)*4));
 
 	//dprintf("Here 1\n");
 	glGenBuffers(1, &gl_index_buffer_handle);

@@ -1,7 +1,7 @@
 #include "misc_util.h"
 
 #include <stdio.h>
-
+#include <vector>
 #include <Windows.h>
 
 //-----------------------------------------------------------------------------
@@ -40,6 +40,18 @@ GLuint CompileGLShader(const char* pchShaderName, const char* pchVertexShader, c
 	if (vShaderCompiled != GL_TRUE)
 	{
 		dprintf("%s - Unable to compile vertex shader %d!\n", pchShaderName, nSceneVertexShader);
+
+		GLint maxLength = 0;
+		glGetShaderiv(nSceneVertexShader, GL_INFO_LOG_LENGTH, &maxLength);
+
+		// The maxLength includes the NULL character
+		char* errorLog = new char[maxLength];
+		glGetShaderInfoLog(nSceneVertexShader, maxLength, &maxLength, errorLog);
+
+		dprintf("%s\n", errorLog);
+
+		delete errorLog;
+
 		glDeleteProgram(unProgramID);
 		glDeleteShader(nSceneVertexShader);
 		return 0;
@@ -56,6 +68,18 @@ GLuint CompileGLShader(const char* pchShaderName, const char* pchVertexShader, c
 	if (fShaderCompiled != GL_TRUE)
 	{
 		dprintf("%s - Unable to compile fragment shader %d!\n", pchShaderName, nSceneFragmentShader);
+
+		GLint maxLength = 0;
+		glGetShaderiv(nSceneFragmentShader, GL_INFO_LOG_LENGTH, &maxLength);
+
+		// The maxLength includes the NULL character
+		char* errorLog = new char[maxLength];
+		glGetShaderInfoLog(nSceneFragmentShader, maxLength, &maxLength, errorLog);
+
+		dprintf("%s\n", errorLog);
+
+		delete errorLog;
+
 		glDeleteProgram(unProgramID);
 		glDeleteShader(nSceneFragmentShader);
 		return 0;
@@ -71,6 +95,7 @@ GLuint CompileGLShader(const char* pchShaderName, const char* pchVertexShader, c
 	if (programSuccess != GL_TRUE)
 	{
 		dprintf("%s - Error linking program %d!\n", pchShaderName, unProgramID);
+
 		glDeleteProgram(unProgramID);
 		return 0;
 	}
