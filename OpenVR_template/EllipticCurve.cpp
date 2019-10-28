@@ -57,7 +57,7 @@ C weierstrass_p_derivative(C z, C tau)
 {
 	C sum = 0;
 
-	const int sum_bounds = 10;
+	const int sum_bounds = 6;
 	for (int m = -sum_bounds; m <= sum_bounds; m++)
 	{
 		for (int n = -sum_bounds; n <= sum_bounds; n++)
@@ -83,6 +83,8 @@ EllipticCurve::EllipticCurve()
 void EllipticCurve::Draw(Matrix4 projection)
 {
 	//dprintf("Here 2.5\n");
+
+	init_mesh();
     
 	// Build the vertex data to send to OpenGL
 	std::vector<float> vert_data;
@@ -126,7 +128,7 @@ void EllipticCurve::Draw(Matrix4 projection)
 		vert_data.push_back(normal.z);
 	}
 
-	const float cutoff_len = 30.0f;
+	const float cutoff_len = 130.0f;
 
 	for (int m = 0; m < grid_num_cols; m++)
 	{
@@ -179,9 +181,22 @@ void EllipticCurve::Draw(Matrix4 projection)
 	glUseProgram(0);
 }
 
+void EllipticCurve::Update()
+{
+
+}
+
 void EllipticCurve::init_mesh()
 {
-	C tau = C(0, 1);
+	double t = 1.3 * sin(GetTickCount64() / 5000.0);
+	C tau = C(sin(t), cos(t));
+	
+	//C tau = C(0, 1.0 + 0.8 * sin(GetTickCount64() / 5000.0));
+
+	//C tau = C(0, 1.0);
+
+	untransformed_verts.clear();
+	indices.clear();
 
 	// Compute the vertices!
 	for (int i = 0; i < grid_num_cols; i++)
@@ -195,7 +210,7 @@ void EllipticCurve::init_mesh()
 
 			untransformed_verts.push_back(Vector4(p.real(), p.imag(), p_prime.real(), p_prime.imag()));
 		}
-		dprintf("Progress on mesh: %i\n", i);
+		//dprintf("Progress on mesh: %i\n", i);
 	}
 
 	for (unsigned int i = 0; i < grid_num_cols; i++)
@@ -229,16 +244,19 @@ void EllipticCurve::init_gl_info()
 		"layout(location = 2) in vec3 normal_in;\n"
 		"out float color_param;\n"
 		"out vec3 normal;\n"
+		"out vec3 source_pos;\n"
 		"void main()\n"
 		"{\n"
 		"    color_param = color_param_in;\n"
 		"    normal = normal_in;\n"
+		"    source_pos = position;\n"
 		"    gl_Position = matrix * vec4(position, 1);\n"
 		"}\n",
 
 		"#version 410 core\n"
 		"in float color_param;\n"
 		"in vec3 normal;\n"
+		"in vec3 source_pos;\n"
 		"out vec3 output_color;\n"
 		"void main()\n"
 		"{\n"
@@ -246,7 +264,11 @@ void EllipticCurve::init_gl_info()
 		"   vec3 light2_dir = normalize(vec3(-1, -1, 0));\n"
 		"   vec3 diffuse = (color_param * vec3(247.0f/255.0f, 101.0f/255.0f, 15.0f/255.0f)\n"
 		"                   + (1 - color_param) * vec3(31.0f/255.0f, 38.0f/255.0f, 244.0f/255.0f));\n"
-		"   output_color = diffuse * ( max(0, dot(normal, light1_dir)) + max(0, 0.5f * dot(normal, light2_dir)));\n"
+		//"   if (color_param < 0.505 && color_param > 0.495)\n"
+		//"       diffuse = vec3(0,1,0);\n"
+		"   if (mod(source_pos.x, 4.0) < 0.2 || mod(source_pos.y, 4.0) < 0.2 || mod(source_pos.z, 4.0) < 0.2)"
+		"       diffuse *= 0.5;\n"
+		"   output_color = diffuse * ( max(0, 2.0f * dot(normal, light1_dir)) + max(0, 0.5f * dot(normal, light2_dir)));\n"
 		"}\n"
 	);
 

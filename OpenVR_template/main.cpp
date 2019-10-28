@@ -424,7 +424,7 @@ bool CMainApplication::BInit()
  	m_fScaleSpacing = 4.0f;
  
  	m_fNearClip = 0.1f;
- 	m_fFarClip = 40.0f;
+ 	m_fFarClip = 50.0f;
  
  	m_iTexture = 0;
  	m_uiVertcount = 0;
@@ -622,6 +622,7 @@ bool CMainApplication::HandleInput()
 	{
 		ProcessVREvent( event );
 	}
+
 
 
 	return bRet;
