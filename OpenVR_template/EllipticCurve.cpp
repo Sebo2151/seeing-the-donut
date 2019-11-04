@@ -14,7 +14,7 @@ C theta(C z, C tau)
 {
 	C sum = 1;
 	C nome = std::exp(pi * ii * tau);
-	const int term_bound = 5;
+	const int term_bound = 7;
 	for (int n = 1; n <= term_bound; n++)
 	{
 		sum += 2.0 * pow(nome, n * n) * cos(2 * pi * n * z);
@@ -57,7 +57,7 @@ C weierstrass_p_derivative(C z, C tau)
 {
 	C sum = 0;
 
-	const int sum_bounds = 6;
+	const int sum_bounds = 10;
 	for (int m = -sum_bounds; m <= sum_bounds; m++)
 	{
 		for (int n = -sum_bounds; n <= sum_bounds; n++)
@@ -84,7 +84,7 @@ void EllipticCurve::Draw(Matrix4 projection)
 {
 	//dprintf("Here 2.5\n");
 
-	init_mesh();
+	//init_mesh();
     
 	// Build the vertex data to send to OpenGL
 	std::vector<float> vert_data;
@@ -94,15 +94,19 @@ void EllipticCurve::Draw(Matrix4 projection)
 	{
 		Vector4 transformed_vert = rotation * untransformed_verts[i] + translation;
 
+		float st = sin(GetTickCount64() / 8000.0);
+		float ct = cos(GetTickCount64() / 8000.0);
 		// Only copy 3 coords to project away a coordinate (namely, im(x), if no transformation done yet.)
-		vert_data.push_back(transformed_vert.x/2);
-		vert_data.push_back(transformed_vert.z/2);
-		vert_data.push_back(transformed_vert.w/2);
+		float projected_axis = transformed_vert.y * ct - transformed_vert.w * st;
+		float dropped_axis = transformed_vert.y * st + transformed_vert.w * ct;
+		vert_data.push_back(transformed_vert.x/20);
+		vert_data.push_back(transformed_vert.z/20);
+		vert_data.push_back(projected_axis/20);
 		
 
 		// Next is the color parameter, a # between 0 and 1 used for coloring.
 		// Intended to make the projected-away coordinate somewhat visible.
-		float color_param = atan(transformed_vert.y) / pi + 0.5f;
+		float color_param = atan(dropped_axis) / pi + 0.5f;
 		vert_data.push_back(color_param );
 
 		// Finally, the normal vector... search out some connected vertices and compute a cross product.
@@ -115,9 +119,9 @@ void EllipticCurve::Draw(Matrix4 projection)
 		Vector4 v_up = rotation * untransformed_verts[this_m + next_n * grid_num_rows] + translation;
 		Vector4 v_right = rotation * untransformed_verts[next_m + next_n * grid_num_rows] + translation;
 
-		Vector3 v_up_3 = Vector3(v_up.x, v_up.z, v_up.w);
-		Vector3 v_right_3 = Vector3(v_right.x, v_right.z, v_right.w);
-		Vector3 v_3 = Vector3(transformed_vert.x, transformed_vert.z, transformed_vert.w);
+		Vector3 v_up_3 = Vector3(v_up.x, v_up.z, v_up.y * ct - v_up.z * st);
+		Vector3 v_right_3 = Vector3(v_right.x, v_right.z, v_right.y * ct - v_right.w * st);
+		Vector3 v_3 = Vector3(transformed_vert.x, transformed_vert.z, projected_axis);
 
 		Vector3 normal = v_right_3 - v_3;
 		normal = normal.cross(v_up_3 - v_3);
@@ -188,12 +192,14 @@ void EllipticCurve::Update()
 
 void EllipticCurve::init_mesh()
 {
-	double t = 1.3 * sin(GetTickCount64() / 5000.0);
-	C tau = C(sin(t), cos(t));
+	//double t = 1.3 * sin(GetTickCount64() / 5000.0);
+    //C tau = C(sin(t), cos(t));
 	
 	//C tau = C(0, 1.0 + 0.8 * sin(GetTickCount64() / 5000.0));
 
-	//C tau = C(0, 1.0);
+	//C tau = C(sqrt(2)/2,sqrt(2)/2);
+
+	C tau = C(0, 1);
 
 	untransformed_verts.clear();
 	indices.clear();

@@ -1,28 +1,28 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(452,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (OpenVR_template.vcxproj).  This can lead to incorrect clean and rebuild behavior.
   EllipticCurve.cpp
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(91,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(103,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,90): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,90): warning C4244:         with
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,90): warning C4244:         [
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,90): warning C4244:             _Ty=double
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,90): warning C4244:         ]
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,74): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,74): warning C4244:         with
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,74): warning C4244:         [
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,74): warning C4244:             _Ty=double
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,74): warning C4244:         ]
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,58): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,58): warning C4244:         with
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,58): warning C4244:         [
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,58): warning C4244:             _Ty=double
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,58): warning C4244:         ]
-  main.cpp
-  Generating Code...
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,48): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,48): warning C4244:         with
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,48): warning C4244:         [
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,48): warning C4244:             _Ty=double
-C:\Users\Sebastian\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(196,48): warning C4244:         ]
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(93,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(97,12): warning C4244:  'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(98,12): warning C4244:  'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(109,21): warning C4244:  'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,90): warning C4244:  'argument': conversion from '_Ty' to 'float', possible loss of data
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,90): warning C4244:         with
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,90): warning C4244:         [
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,90): warning C4244:             _Ty=double
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,90): warning C4244:         ]
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,74): warning C4244:  'argument': conversion from '_Ty' to 'float', possible loss of data
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,74): warning C4244:         with
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,74): warning C4244:         [
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,74): warning C4244:             _Ty=double
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,74): warning C4244:         ]
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,58): warning C4244:  'argument': conversion from '_Ty' to 'float', possible loss of data
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,58): warning C4244:         with
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,58): warning C4244:         [
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,58): warning C4244:             _Ty=double
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,58): warning C4244:         ]
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,48): warning C4244:  'argument': conversion from '_Ty' to 'float', possible loss of data
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,48): warning C4244:         with
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,48): warning C4244:         [
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,48): warning C4244:             _Ty=double
+C:\Users\ICERM\Documents\seeing-the-donut\OpenVR_template\EllipticCurve.cpp(217,48): warning C4244:         ]
 EllipticCurve.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
-  OpenVR_template.vcxproj -> C:\Users\Sebastian\Documents\seeing-the-donut\Debug\Donut.exe
+  OpenVR_template.vcxproj -> C:\Users\ICERM\Documents\seeing-the-donut\Debug\Donut.exe

@@ -21,8 +21,8 @@ public:
 private:
 	// Computational data
 
-	static const int grid_num_cols = 50;
-	static const int grid_num_rows = 50;
+	static const int grid_num_cols = 60;
+	static const int grid_num_rows = 60;
 	std::complex<float> tau;
 
 	std::vector<Vector4> untransformed_verts;
