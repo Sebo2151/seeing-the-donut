@@ -57,7 +57,7 @@ C weierstrass_p_derivative(C z, C tau)
 {
 	C sum = 0;
 
-	const int sum_bounds = 10;
+	const int sum_bounds = 12;
 	for (int m = -sum_bounds; m <= sum_bounds; m++)
 	{
 		for (int n = -sum_bounds; n <= sum_bounds; n++)
@@ -94,19 +94,19 @@ void EllipticCurve::Draw(Matrix4 projection)
 	{
 		Vector4 transformed_vert = rotation * untransformed_verts[i] + translation;
 
-		float st = sin(GetTickCount64() / 8000.0);
-		float ct = cos(GetTickCount64() / 8000.0);
+		float st = sin(GetTickCount64() / 18000.0);
+		float ct = cos(GetTickCount64() / 18000.0);
 		// Only copy 3 coords to project away a coordinate (namely, im(x), if no transformation done yet.)
 		float projected_axis = transformed_vert.y * ct - transformed_vert.w * st;
 		float dropped_axis = transformed_vert.y * st + transformed_vert.w * ct;
-		vert_data.push_back(transformed_vert.x/20);
-		vert_data.push_back(transformed_vert.z/20);
-		vert_data.push_back(projected_axis/20);
+		vert_data.push_back(transformed_vert.x/10);
+		vert_data.push_back(transformed_vert.z/20 + 1);
+		vert_data.push_back(projected_axis/20 );
 		
 
 		// Next is the color parameter, a # between 0 and 1 used for coloring.
 		// Intended to make the projected-away coordinate somewhat visible.
-		float color_param = atan(dropped_axis) / pi + 0.5f;
+		float color_param = atan(dropped_axis / 20) / pi + 0.5f;
 		vert_data.push_back(color_param );
 
 		// Finally, the normal vector... search out some connected vertices and compute a cross product.
@@ -119,7 +119,7 @@ void EllipticCurve::Draw(Matrix4 projection)
 		Vector4 v_up = rotation * untransformed_verts[this_m + next_n * grid_num_rows] + translation;
 		Vector4 v_right = rotation * untransformed_verts[next_m + next_n * grid_num_rows] + translation;
 
-		Vector3 v_up_3 = Vector3(v_up.x, v_up.z, v_up.y * ct - v_up.z * st);
+		Vector3 v_up_3 = Vector3(v_up.x, v_up.z, v_up.y * ct - v_up.w * st);
 		Vector3 v_right_3 = Vector3(v_right.x, v_right.z, v_right.y * ct - v_right.w * st);
 		Vector3 v_3 = Vector3(transformed_vert.x, transformed_vert.z, projected_axis);
 
@@ -130,6 +130,10 @@ void EllipticCurve::Draw(Matrix4 projection)
 		vert_data.push_back(normal.x);
 		vert_data.push_back(normal.y);
 		vert_data.push_back(normal.z);
+
+		// Push back "texture coordinates" of the input to the weierstrass function
+		vert_data.push_back((float)this_m / grid_num_rows);
+		vert_data.push_back((float)this_n / grid_num_cols);
 	}
 
 	const float cutoff_len = 130.0f;
@@ -197,9 +201,12 @@ void EllipticCurve::init_mesh()
 	
 	//C tau = C(0, 1.0 + 0.8 * sin(GetTickCount64() / 5000.0));
 
-	//C tau = C(sqrt(2)/2,sqrt(2)/2);
+	//C tau = C(sqrt(2.0)/2.0,sqrt(2.0)/2.0);
+	C tau = C(1.0 / 2.0, sqrt(3.0) / 2.0);
+	
+	//C tau = C(0, 1);
 
-	C tau = C(0, 1);
+	//C tau = C(0.4, 1.3);
 
 	untransformed_verts.clear();
 	indices.clear();
@@ -248,14 +255,17 @@ void EllipticCurve::init_gl_info()
 		"layout(location = 0) in vec3 position;\n"
 		"layout(location = 1) in float color_param_in;\n"
 		"layout(location = 2) in vec3 normal_in;\n"
+		"layout(location = 3) in vec2 texCoord_in;\n"
 		"out float color_param;\n"
 		"out vec3 normal;\n"
 		"out vec3 source_pos;\n"
+		"out vec2 texCoord;\n"
 		"void main()\n"
 		"{\n"
 		"    color_param = color_param_in;\n"
 		"    normal = normal_in;\n"
 		"    source_pos = position;\n"
+		"    texCoord = texCoord_in;\n"
 		"    gl_Position = matrix * vec4(position, 1);\n"
 		"}\n",
 
@@ -263,6 +273,7 @@ void EllipticCurve::init_gl_info()
 		"in float color_param;\n"
 		"in vec3 normal;\n"
 		"in vec3 source_pos;\n"
+		"in vec2 texCoord;\n"
 		"out vec3 output_color;\n"
 		"void main()\n"
 		"{\n"
@@ -270,11 +281,10 @@ void EllipticCurve::init_gl_info()
 		"   vec3 light2_dir = normalize(vec3(-1, -1, 0));\n"
 		"   vec3 diffuse = (color_param * vec3(247.0f/255.0f, 101.0f/255.0f, 15.0f/255.0f)\n"
 		"                   + (1 - color_param) * vec3(31.0f/255.0f, 38.0f/255.0f, 244.0f/255.0f));\n"
-		//"   if (color_param < 0.505 && color_param > 0.495)\n"
-		//"       diffuse = vec3(0,1,0);\n"
-		"   if (mod(source_pos.x, 4.0) < 0.2 || mod(source_pos.y, 4.0) < 0.2 || mod(source_pos.z, 4.0) < 0.2)"
+		"   if (mod(20*texCoord.x, 1.0) < 0.1 || mod(20*texCoord.y, 1.0) < 0.1)"
 		"       diffuse *= 0.5;\n"
-		"   output_color = diffuse * ( max(0, 2.0f * dot(normal, light1_dir)) + max(0, 0.5f * dot(normal, light2_dir)));\n"
+		//"   vec3 diffuse = vec3(0, texCoord.x, texCoord.y);\n"
+		"   output_color = diffuse * ( abs(1.2f * dot(normal, light1_dir)) + abs(0.3f * dot(normal, light2_dir)));\n"
 		"}\n"
 	);
 
@@ -298,7 +308,7 @@ void EllipticCurve::init_gl_info()
 	glGenBuffers(1, &gl_vert_data_buffer_handle);
 	glBindBuffer(GL_ARRAY_BUFFER, gl_vert_data_buffer_handle);
 
-	GLsizei stride = sizeof(float) * (3 + 1 + 3); // vertex + color param + normal
+	GLsizei stride = sizeof(float) * (3 + 1 + 3 + 2); // vertex + color param + normal + tex coord
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0);
@@ -308,6 +318,9 @@ void EllipticCurve::init_gl_info()
 
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (const void*)(sizeof(float)*4));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, stride, (const void*)(sizeof(float)*7));
 
 	//dprintf("Here 1\n");
 	glGenBuffers(1, &gl_index_buffer_handle);
