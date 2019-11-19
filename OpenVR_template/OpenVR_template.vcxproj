@@ -158,6 +158,11 @@
     <ClInclude Include="util\strtools.h" />
     <ClInclude Include="util\Vectors.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\hellovr_actions.json" />
+    <None Include="..\hellovr_bindings_generic.json" />
+    <None Include="..\hellovr_bindings_vive_controller.json" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

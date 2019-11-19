@@ -1,59 +1,49 @@
 {
-      "default_bindings": [
-         {
-            "controller_type" : "vive_controller",
-            "binding_url" : "hellovr_bindings_vive_controller.json"
-         },
-         {
-            "controller_type" : "generic",
-            "binding_url" : "hellovr_bindings_generic.json"
-         }
-      ], 
   "actions": [
     {
-      "name": "/actions/demo/in/HideCubes",
+      "name": "/actions/donut/in/LeftButton",
       "type": "boolean"
     },
     {
-      "name": "/actions/demo/in/HideThisController",
+      "name": "/actions/donut/in/RightButton",
       "type": "boolean"
     },
     {
-      "name": "/actions/demo/in/triggerhaptic",
-      "type": "boolean"
-    },
-    {
-      "name": "/actions/demo/in/AnalogInput",
-      "type": "vector2"
-    },
-    {
-      "name": "/actions/demo/in/Hand_Right",
+      "name": "/actions/donut/in/Hand_Right",
       "type": "pose"
     },
     {
-      "name": "/actions/demo/in/Hand_Left",
+      "name": "/actions/donut/in/Hand_Left",
       "type": "pose"
     },
     {
-      "name": "/actions/demo/out/haptic_left",
+      "name": "/actions/donut/out/haptic_left",
       "type": "vibration"
     },
     {
-      "name": "/actions/demo/out/haptic_right",
+      "name": "/actions/donut/out/haptic_right",
       "type": "vibration"
     }
   ],
-    "localization" : [
-        {
-            "language_tag": "en_US",
-            "/actions/demo/in/HideCubes" : "Hide Cubes",
-            "/actions/demo/in/HideThisController" : "Hide this Controller",
-            "/actions/demo/in/triggerhaptic" : "Trigger Haptic Pulse",
-            "/actions/demo/in/AnalogInput" : "Analog Input",
-            "/actions/demo/in/Hand_Right" : "Right Hand Pose",
-            "/actions/demo/in/Hand_Left" : "Left Hand Pose",
-            "/actions/demo/out/haptic_left" : "Left Haptic Feedback",
-            "/actions/demo/out/haptic_right" : "Right Haptic Feedback"
-        }
-    ]
+  "default_bindings": [
+    {
+      "controller_type": "vive_controller",
+      "binding_url": "hellovr_bindings_vive_controller.json"
+    },
+    {
+      "controller_type": "generic",
+      "binding_url": "hellovr_bindings_generic.json"
+    }
+  ],
+  "localization": [
+    {
+      "language_tag": "en_US",
+      "/actions/donut/in/LeftButton": "Left Button",
+      "/actions/donut/in/RightButton": "Right Button",
+      "/actions/donut/in/Hand_Right": "Right Hand Pose",
+      "/actions/donut/in/Hand_Left": "Left Hand Pose",
+      "/actions/donut/out/haptic_left": "Left Haptic Feedback",
+      "/actions/donut/out/haptic_right": "Right Haptic Feedback"
+    }
+  ]
 }

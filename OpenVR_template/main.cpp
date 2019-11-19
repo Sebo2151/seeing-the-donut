@@ -239,6 +239,11 @@ private: // OpenGL bookkeeping
 
 	std::vector< CGLRenderModel * > m_vecRenderModels;
 
+	vr::VRActionHandle_t m_actionLeftButton = vr::k_ulInvalidActionHandle;
+	vr::VRActionHandle_t m_actionRightButton = vr::k_ulInvalidActionHandle;
+
+	vr::VRActionSetHandle_t m_actionSet = vr::k_ulInvalidActionSetHandle;
+
 	EllipticCurve* ec = 0;
 };
 
@@ -428,9 +433,6 @@ bool CMainApplication::BInit()
  
  	m_iTexture = 0;
  	m_uiVertcount = 0;
- 
-// 		m_MillisecondsTimer.start(1, this);
-// 		m_SecondsTimer.start(1000, this);
 	
 	if (!BInitGL())
 	{
@@ -443,6 +445,21 @@ bool CMainApplication::BInit()
 		printf("%s - Failed to initialize VR Compositor!\n", __FUNCTION__);
 		return false;
 	}
+
+	vr::VRInput()->SetActionManifestPath(Path_MakeAbsolute("../hellovr_actions.json", Path_StripFilename(Path_GetExecutablePath())).c_str());
+
+	vr::VRInput()->GetActionHandle("/actions/donut/in/LeftButton", &m_actionLeftButton);
+	vr::VRInput()->GetActionHandle("/actions/donut/in/RightButton", &m_actionRightButton);
+
+	vr::VRInput()->GetActionSetHandle("/actions/donut", &m_actionSet);
+
+	vr::VRInput()->GetActionHandle("/actions/demo/out/Haptic_Left", &m_rHand[Left].m_actionHaptic);
+	vr::VRInput()->GetInputSourceHandle("/user/hand/left", &m_rHand[Left].m_source);
+	vr::VRInput()->GetActionHandle("/actions/demo/in/Hand_Left", &m_rHand[Left].m_actionPose);
+
+	vr::VRInput()->GetActionHandle("/actions/demo/out/Haptic_Right", &m_rHand[Right].m_actionHaptic);
+	vr::VRInput()->GetInputSourceHandle("/user/hand/right", &m_rHand[Right].m_source);
+	vr::VRInput()->GetActionHandle("/actions/demo/in/Hand_Right", &m_rHand[Right].m_actionPose);
 
 	return true;
 }
@@ -623,7 +640,56 @@ bool CMainApplication::HandleInput()
 		ProcessVREvent( event );
 	}
 
+	vr::VRActiveActionSet_t actionSet = { 0 };
+	actionSet.ulActionSet = m_actionSet;
+	vr::VRInput()->UpdateActionState(&actionSet, sizeof(actionSet), 1);
 
+	// TO DO: Do some button logic...
+	vr::VRInputValueHandle_t incoming_device;
+	vr::InputDigitalActionData_t leftButtonActionData;
+	vr::InputDigitalActionData_t rightButtonActionData;
+	vr::VRInput()->GetDigitalActionData(m_actionLeftButton, &leftButtonActionData, sizeof(leftButtonActionData), vr::k_ulInvalidActionHandle);
+	vr::VRInput()->GetDigitalActionData(m_actionRightButton, &rightButtonActionData, sizeof(rightButtonActionData), vr::k_ulInvalidActionHandle);
+	
+	if (leftButtonActionData.bActive && leftButtonActionData.bChanged)
+	{
+		ec->translation += Vector4(0, 0, 1, 0);
+	}
+	else if (rightButtonActionData.bActive && rightButtonActionData.bChanged)
+	{
+		ec->translation += Vector4(0, 0, -1, 0);
+	}
+
+	// Controller rendering logic...
+
+	m_rHand[Left].m_bShowController = true;
+	m_rHand[Right].m_bShowController = true;
+
+	for (EHand eHand = Left; eHand <= Right; ((int&)eHand)++)
+	{
+		vr::InputPoseActionData_t poseData;
+		if (vr::VRInput()->GetPoseActionDataForNextFrame(m_rHand[eHand].m_actionPose, vr::TrackingUniverseStanding, &poseData, sizeof(poseData), vr::k_ulInvalidInputValueHandle) != vr::VRInputError_None
+			|| !poseData.bActive || !poseData.pose.bPoseIsValid)
+		{
+			m_rHand[eHand].m_bShowController = false;
+		}
+		else
+		{
+			m_rHand[eHand].m_rmat4Pose = ConvertSteamVRMatrixToMatrix4(poseData.pose.mDeviceToAbsoluteTracking);
+
+			vr::InputOriginInfo_t originInfo;
+			if (vr::VRInput()->GetOriginTrackedDeviceInfo(poseData.activeOrigin, &originInfo, sizeof(originInfo)) == vr::VRInputError_None
+				&& originInfo.trackedDeviceIndex != vr::k_unTrackedDeviceIndexInvalid)
+			{
+				std::string sRenderModelName = GetTrackedDeviceString(originInfo.trackedDeviceIndex, vr::Prop_RenderModelName_String);
+				if (sRenderModelName != m_rHand[eHand].m_sRenderModelName)
+				{
+					m_rHand[eHand].m_pRenderModel = FindOrLoadRenderModel(sRenderModelName.c_str());
+					m_rHand[eHand].m_sRenderModelName = sRenderModelName;
+				}
+			}
+		}
+	}
 
 	return bRet;
 }

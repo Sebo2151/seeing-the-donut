@@ -18,6 +18,9 @@ public:
 	void Draw(Matrix4 projection);
 	void Update();
 
+	Vector4 translation;
+	Matrix4 rotation;
+
 private:
 	// Computational data
 
@@ -27,9 +30,6 @@ private:
 
 	std::vector<Vector4> untransformed_verts;
 	std::vector<unsigned int> indices;
-
-	Vector4 translation;
-	Matrix4 rotation;
 	
 	// GL data
 	GLuint gl_program_handle = 0;

@@ -72,4 +72,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\hellovr_actions.json">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\hellovr_bindings_generic.json">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\hellovr_bindings_vive_controller.json">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>
