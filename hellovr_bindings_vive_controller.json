@@ -3,11 +3,11 @@
       "/actions/donut" : {
          "poses" : [
             {
-               "output" : "/actions/donut/in/hand_left",
+               "output" : "/actions/donut/in/Hand_Left",
                "path" : "/user/hand/left/pose/raw"
             },
             {
-               "output" : "/actions/donut/in/hand_right",
+               "output" : "/actions/donut/in/Hand_Right",
                "path" : "/user/hand/right/pose/raw"
             }
          ],

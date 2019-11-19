@@ -101,8 +101,10 @@ void EllipticCurve::Draw(Matrix4 projection)
 	{
 		Vector4 transformed_vert = rotation * untransformed_verts[i] + translation;
 
-		float st = sin(GetTickCount64() / 18000.0);
-		float ct = cos(GetTickCount64() / 18000.0);
+		//float st = sin(GetTickCount64() / 18000.0);
+		//float ct = cos(GetTickCount64() / 18000.0);
+		float st = 0;
+		float ct = 1;
 		// Only copy 3 coords to project away a coordinate (namely, im(x), if no transformation done yet.)
 		float projected_axis = transformed_vert.y * ct - transformed_vert.w * st;
 		float dropped_axis = transformed_vert.y * st + transformed_vert.w * ct;

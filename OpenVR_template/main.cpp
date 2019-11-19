@@ -453,13 +453,13 @@ bool CMainApplication::BInit()
 
 	vr::VRInput()->GetActionSetHandle("/actions/donut", &m_actionSet);
 
-	vr::VRInput()->GetActionHandle("/actions/demo/out/Haptic_Left", &m_rHand[Left].m_actionHaptic);
+	vr::VRInput()->GetActionHandle("/actions/donut/out/Haptic_Left", &m_rHand[Left].m_actionHaptic);
 	vr::VRInput()->GetInputSourceHandle("/user/hand/left", &m_rHand[Left].m_source);
-	vr::VRInput()->GetActionHandle("/actions/demo/in/Hand_Left", &m_rHand[Left].m_actionPose);
+	vr::VRInput()->GetActionHandle("/actions/donut/in/Hand_Left", &m_rHand[Left].m_actionPose);
 
-	vr::VRInput()->GetActionHandle("/actions/demo/out/Haptic_Right", &m_rHand[Right].m_actionHaptic);
+	vr::VRInput()->GetActionHandle("/actions/donut/out/Haptic_Right", &m_rHand[Right].m_actionHaptic);
 	vr::VRInput()->GetInputSourceHandle("/user/hand/right", &m_rHand[Right].m_source);
-	vr::VRInput()->GetActionHandle("/actions/demo/in/Hand_Right", &m_rHand[Right].m_actionPose);
+	vr::VRInput()->GetActionHandle("/actions/donut/in/Hand_Right", &m_rHand[Right].m_actionPose);
 
 	return true;
 }
@@ -499,7 +499,7 @@ bool CMainApplication::BInitGL()
 	SetupCameras();
 	SetupStereoRenderTargets();
 	SetupCompanionWindow();
-
+	  
 	return true;
 }
 
