@@ -644,41 +644,26 @@ bool CMainApplication::HandleInput()
 	actionSet.ulActionSet = m_actionSet;
 	vr::VRInput()->UpdateActionState(&actionSet, sizeof(actionSet), 1);
 
-	// TO DO: Do some button logic...
-	vr::VRInputValueHandle_t incoming_device;
-	vr::InputDigitalActionData_t leftButtonActionData;
-	vr::InputDigitalActionData_t rightButtonActionData;
-	vr::VRInput()->GetDigitalActionData(m_actionLeftButton, &leftButtonActionData, sizeof(leftButtonActionData), vr::k_ulInvalidActionHandle);
-	vr::VRInput()->GetDigitalActionData(m_actionRightButton, &rightButtonActionData, sizeof(rightButtonActionData), vr::k_ulInvalidActionHandle);
-	
-	if (leftButtonActionData.bActive && leftButtonActionData.bChanged)
-	{
-		ec->translation += Vector4(0, 0, 1, 0);
-	}
-	else if (rightButtonActionData.bActive && rightButtonActionData.bChanged)
-	{
-		ec->translation += Vector4(0, 0, -1, 0);
-	}
-
-	// Controller rendering logic...
+	// Controller tracking logic...
 
 	m_rHand[Left].m_bShowController = true;
 	m_rHand[Right].m_bShowController = true;
 
+	vr::InputPoseActionData_t poseData[2];
 	for (EHand eHand = Left; eHand <= Right; ((int&)eHand)++)
 	{
-		vr::InputPoseActionData_t poseData;
-		if (vr::VRInput()->GetPoseActionDataForNextFrame(m_rHand[eHand].m_actionPose, vr::TrackingUniverseStanding, &poseData, sizeof(poseData), vr::k_ulInvalidInputValueHandle) != vr::VRInputError_None
-			|| !poseData.bActive || !poseData.pose.bPoseIsValid)
+		
+		if (vr::VRInput()->GetPoseActionDataForNextFrame(m_rHand[eHand].m_actionPose, vr::TrackingUniverseStanding, &(poseData[eHand]), sizeof(*poseData), vr::k_ulInvalidInputValueHandle) != vr::VRInputError_None
+			|| !poseData[eHand].bActive || !poseData[eHand].pose.bPoseIsValid)
 		{
 			m_rHand[eHand].m_bShowController = false;
 		}
 		else
 		{
-			m_rHand[eHand].m_rmat4Pose = ConvertSteamVRMatrixToMatrix4(poseData.pose.mDeviceToAbsoluteTracking);
+			m_rHand[eHand].m_rmat4Pose = ConvertSteamVRMatrixToMatrix4(poseData[eHand].pose.mDeviceToAbsoluteTracking);
 
 			vr::InputOriginInfo_t originInfo;
-			if (vr::VRInput()->GetOriginTrackedDeviceInfo(poseData.activeOrigin, &originInfo, sizeof(originInfo)) == vr::VRInputError_None
+			if (vr::VRInput()->GetOriginTrackedDeviceInfo(poseData[eHand].activeOrigin, &originInfo, sizeof(originInfo)) == vr::VRInputError_None
 				&& originInfo.trackedDeviceIndex != vr::k_unTrackedDeviceIndexInvalid)
 			{
 				std::string sRenderModelName = GetTrackedDeviceString(originInfo.trackedDeviceIndex, vr::Prop_RenderModelName_String);
@@ -690,6 +675,13 @@ bool CMainApplication::HandleInput()
 			}
 		}
 	}
+
+	vr::InputDigitalActionData_t leftButtonActionData;
+	vr::InputDigitalActionData_t rightButtonActionData;
+	vr::VRInput()->GetDigitalActionData(m_actionLeftButton, &leftButtonActionData, sizeof(leftButtonActionData), vr::k_ulInvalidActionHandle);
+	vr::VRInput()->GetDigitalActionData(m_actionRightButton, &rightButtonActionData, sizeof(rightButtonActionData), vr::k_ulInvalidActionHandle);
+
+	ec->Update(leftButtonActionData, rightButtonActionData, poseData[Left], poseData[Right]);
 
 	return bRet;
 }

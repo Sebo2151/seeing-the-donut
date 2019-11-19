@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 #include "misc_util.h"
+#include "Quat.h"
 
 typedef  std::complex<double> C;
 
@@ -75,6 +76,12 @@ EllipticCurve::EllipticCurve()
 
 	translation = Vector4(0, 0, 0, 0);
 	rotation.identity();
+
+	storedRotLeft.identity();
+	storedRotRight.identity();
+	oldRotation.identity();
+
+	rotating = false;
 
 	init_gl_info();
 	init_mesh();
@@ -189,9 +196,49 @@ void EllipticCurve::Draw(Matrix4 projection)
 	glUseProgram(0);
 }
 
-void EllipticCurve::Update()
+Matrix3& toRotMat(vr::HmdMatrix34_t matPose)
 {
+	return Matrix3(
+		matPose.m[0][0], matPose.m[1][0], matPose.m[2][0],
+		matPose.m[0][1], matPose.m[1][1], matPose.m[2][1],
+		matPose.m[0][2], matPose.m[1][2], matPose.m[2][2]
+	);
+}
 
+void EllipticCurve::Update(vr::InputDigitalActionData_t leftButtonActionData, vr::InputDigitalActionData_t rightButtonActionData,
+	vr::InputPoseActionData_t leftPose, vr::InputPoseActionData_t rightPose)
+{
+	if (!leftPose.bActive || !rightPose.bActive || !leftPose.pose.bPoseIsValid || !rightPose.pose.bPoseIsValid)
+	{
+		rotating = false;
+		return;
+	}
+
+	if (!rotating && leftButtonActionData.bState && rightButtonActionData.bState)
+	{
+		rotating = true;
+		storedRotLeft = toRotMat(leftPose.pose.mDeviceToAbsoluteTracking);
+		storedRotRight = toRotMat(rightPose.pose.mDeviceToAbsoluteTracking);
+	}
+	else if (leftButtonActionData.bState && rightButtonActionData.bState)
+	{
+		Matrix3 curRotLeft = toRotMat(leftPose.pose.mDeviceToAbsoluteTracking);
+		Matrix3 curRotRight = toRotMat(rightPose.pose.mDeviceToAbsoluteTracking);
+
+		Matrix3 storedRotLeftTranspose = storedRotLeft;
+		storedRotLeftTranspose.transpose();
+		Matrix3 storedRotRightTranspose = storedRotRight;
+		storedRotRightTranspose.transpose();
+		Matrix3 deltaRotLeft = curRotLeft * storedRotLeftTranspose;
+		Matrix3 deltaRotRight = curRotRight * storedRotRightTranspose;
+
+		Quat first = Quat::fromMat3(deltaRotLeft);
+		Quat second = Quat::fromMat3(deltaRotRight);
+
+		Matrix4 newRotation = Quat::toRot(first, second);
+
+		rotation = newRotation * oldRotation;
+	}
 }
 
 void EllipticCurve::init_mesh()

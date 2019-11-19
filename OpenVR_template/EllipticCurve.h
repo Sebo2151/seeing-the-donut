@@ -7,6 +7,8 @@
 #include <SDL_opengl.h>
 #include <GL/GLU.h>
 
+#include <openvr.h>
+
 #include "util/Vectors.h"
 #include "util/Matrices.h"
 
@@ -16,10 +18,8 @@ public:
 	EllipticCurve();
 
 	void Draw(Matrix4 projection);
-	void Update();
-
-	Vector4 translation;
-	Matrix4 rotation;
+	void Update(vr::InputDigitalActionData_t leftButtonActionData, vr::InputDigitalActionData_t rightButtonActionData,
+		vr::InputPoseActionData_t leftPose, vr::InputPoseActionData_t rightPose);
 
 private:
 	// Computational data
@@ -44,5 +44,13 @@ private:
 	void init_mesh();
 	void init_gl_info();
 
+	Vector4 translation;
+	Matrix4 rotation;
+
+	// UI data
+	Matrix3 storedRotLeft;
+	Matrix3 storedRotRight;
+	Matrix4 oldRotation;
+	bool rotating;
 };
 
