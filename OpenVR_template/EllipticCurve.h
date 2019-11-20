@@ -26,7 +26,7 @@ private:
 
 	static const int grid_num_cols = 200;
 	static const int grid_num_rows = 200;
-	std::complex<float> tau;
+	std::complex<double> tau;
 
 	std::vector<Vector4> untransformed_verts;
 	std::vector<unsigned int> indices;

@@ -83,16 +83,14 @@ EllipticCurve::EllipticCurve()
 
 	rotating = false;
 
+	tau = C(0, 1);
+
 	init_gl_info();
 	init_mesh();
 }
 
 void EllipticCurve::Draw(Matrix4 projection)
-{
-	//dprintf("Here 2.5\n");
-
-	//init_mesh();
-    
+{  
 	// Build the vertex data to send to OpenGL
 	std::vector<float> vert_data;
 	std::vector<unsigned int> good_indices;
@@ -101,10 +99,6 @@ void EllipticCurve::Draw(Matrix4 projection)
 	{
 		Vector4 transformed_vert = rotation * untransformed_verts[i] + translation;
 
-		//float st = sin(GetTickCount64() / 18000.0);
-		//float ct = cos(GetTickCount64() / 18000.0);
-		float st = 0;
-		float ct = 1;
 		// Only copy 3 coords to project away a coordinate (namely, im(x), if no transformation done yet.)
 		vert_data.push_back(transformed_vert.x/10);
 		vert_data.push_back(transformed_vert.y/10 + 1);
@@ -253,18 +247,6 @@ void EllipticCurve::Update(vr::InputDigitalActionData_t leftButtonActionData, vr
 
 void EllipticCurve::init_mesh()
 {
-	//double t = 1.3 * sin(GetTickCount64() / 5000.0);
-    //C tau = C(sin(t), cos(t));
-	
-	//C tau = C(0, 1.0 + 0.8 * sin(GetTickCount64() / 5000.0));
-
-	C tau = C(sqrt(2.0)/2.0,sqrt(2.0)/2.0);
-	//C tau = C(1.0 / 2.0, sqrt(3.0) / 2.0);
-	
-	//C tau = C(0, 1);
-
-	//C tau = C(0.4, 1.3);
-
 	untransformed_verts.clear();
 	indices.clear();
 
