@@ -106,16 +106,14 @@ void EllipticCurve::Draw(Matrix4 projection)
 		float st = 0;
 		float ct = 1;
 		// Only copy 3 coords to project away a coordinate (namely, im(x), if no transformation done yet.)
-		float projected_axis = transformed_vert.y * ct - transformed_vert.w * st;
-		float dropped_axis = transformed_vert.y * st + transformed_vert.w * ct;
 		vert_data.push_back(transformed_vert.x/10);
-		vert_data.push_back(transformed_vert.z/20 + 1);
-		vert_data.push_back(projected_axis/20 );
+		vert_data.push_back(transformed_vert.y/10 + 1);
+		vert_data.push_back(transformed_vert.z/10 );
 		
 
 		// Next is the color parameter, a # between 0 and 1 used for coloring.
 		// Intended to make the projected-away coordinate somewhat visible.
-		float color_param = atan(dropped_axis / 20) / pi + 0.5f;
+		float color_param = atan(transformed_vert.w / 20) / pi + 0.5f;
 		vert_data.push_back(color_param );
 
 		// Finally, the normal vector... search out some connected vertices and compute a cross product.
@@ -128,9 +126,9 @@ void EllipticCurve::Draw(Matrix4 projection)
 		Vector4 v_up = rotation * untransformed_verts[this_m + next_n * grid_num_rows] + translation;
 		Vector4 v_right = rotation * untransformed_verts[next_m + next_n * grid_num_rows] + translation;
 
-		Vector3 v_up_3 = Vector3(v_up.x, v_up.z, v_up.y * ct - v_up.w * st);
-		Vector3 v_right_3 = Vector3(v_right.x, v_right.z, v_right.y * ct - v_right.w * st);
-		Vector3 v_3 = Vector3(transformed_vert.x, transformed_vert.z, projected_axis);
+		Vector3 v_up_3 = Vector3(v_up.x, v_up.y, v_up.z);
+		Vector3 v_right_3 = Vector3(v_right.x, v_right.y, v_right.z);
+		Vector3 v_3 = Vector3(transformed_vert.x, transformed_vert.y, transformed_vert.z);
 
 		Vector3 normal = v_right_3 - v_3;
 		normal = normal.cross(v_up_3 - v_3);
@@ -145,7 +143,7 @@ void EllipticCurve::Draw(Matrix4 projection)
 		vert_data.push_back((float)this_n / grid_num_cols);
 	}
 
-	const float cutoff_len = 130.0f;
+	const float cutoff_len = 80.0f;
 
 	for (int m = 0; m < grid_num_cols; m++)
 	{
@@ -201,9 +199,9 @@ void EllipticCurve::Draw(Matrix4 projection)
 Matrix3& toRotMat(vr::HmdMatrix34_t matPose)
 {
 	return Matrix3(
-		matPose.m[0][0], matPose.m[1][0], matPose.m[2][0],
-		matPose.m[0][1], matPose.m[1][1], matPose.m[2][1],
-		matPose.m[0][2], matPose.m[1][2], matPose.m[2][2]
+		matPose.m[0][0], matPose.m[0][1], matPose.m[0][2],
+		matPose.m[1][0], matPose.m[1][1], matPose.m[1][2],
+		matPose.m[2][0], matPose.m[2][1], matPose.m[2][2]
 	);
 }
 
@@ -221,6 +219,7 @@ void EllipticCurve::Update(vr::InputDigitalActionData_t leftButtonActionData, vr
 		rotating = true;
 		storedRotLeft = toRotMat(leftPose.pose.mDeviceToAbsoluteTracking);
 		storedRotRight = toRotMat(rightPose.pose.mDeviceToAbsoluteTracking);
+		oldRotation = rotation;
 	}
 	else if (leftButtonActionData.bState && rightButtonActionData.bState)
 	{
@@ -231,15 +230,24 @@ void EllipticCurve::Update(vr::InputDigitalActionData_t leftButtonActionData, vr
 		storedRotLeftTranspose.transpose();
 		Matrix3 storedRotRightTranspose = storedRotRight;
 		storedRotRightTranspose.transpose();
-		Matrix3 deltaRotLeft = curRotLeft * storedRotLeftTranspose;
-		Matrix3 deltaRotRight = curRotRight * storedRotRightTranspose;
+		Matrix3 deltaRotLeft = storedRotLeftTranspose * curRotLeft;
+		Matrix3 deltaRotRight = storedRotRightTranspose * curRotRight;
 
 		Quat first = Quat::fromMat3(deltaRotLeft);
 		Quat second = Quat::fromMat3(deltaRotRight);
 
 		Matrix4 newRotation = Quat::toRot(first, second);
+		newRotation.transpose();
 
 		rotation = newRotation * oldRotation;
+
+		oldRotation = rotation;
+		storedRotLeft = curRotLeft;
+		storedRotRight = curRotRight;
+	}
+	else
+	{
+		rotating = false;
 	}
 }
 
@@ -250,8 +258,8 @@ void EllipticCurve::init_mesh()
 	
 	//C tau = C(0, 1.0 + 0.8 * sin(GetTickCount64() / 5000.0));
 
-	//C tau = C(sqrt(2.0)/2.0,sqrt(2.0)/2.0);
-	C tau = C(1.0 / 2.0, sqrt(3.0) / 2.0);
+	C tau = C(sqrt(2.0)/2.0,sqrt(2.0)/2.0);
+	//C tau = C(1.0 / 2.0, sqrt(3.0) / 2.0);
 	
 	//C tau = C(0, 1);
 
