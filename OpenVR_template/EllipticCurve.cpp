@@ -83,7 +83,7 @@ EllipticCurve::EllipticCurve()
 
 	rotating = false;
 
-	tau = C(0, 1);
+	tau = C(.5, .5);
 
 	init_gl_info();
 	init_mesh();
@@ -320,9 +320,16 @@ void EllipticCurve::init_gl_info()
 		"   vec3 light2_dir = normalize(vec3(-1, -1, 0));\n"
 		"   vec3 diffuse = (color_param * vec3(247.0f/255.0f, 101.0f/255.0f, 15.0f/255.0f)\n"
 		"                   + (1 - color_param) * vec3(31.0f/255.0f, 38.0f/255.0f, 244.0f/255.0f));\n"
-		"   if (mod(20*texCoord.x, 1.0) < 0.1 || mod(20*texCoord.y, 1.0) < 0.1)"
+		"   if (20*texCoord.x < 0.1)\n"
+		"       diffuse = vec3(1,1,1);\n"
+		"   else if (20*texCoord.y < 0.1)\n"
+		"       diffuse = vec3(0.866,0,0);\n"
+		"   else if (20*texCoord.y < 10.1 && 20*texCoord.y > 9.9)"
+		"       diffuse = vec3(.2,.768, 1.0);\n"
+		"   else if (20*texCoord.x < 10.1 && 20*texCoord.x > 9.9)"
+		"       diffuse = vec3(.0941,.878,0);\n"
+		"   else if (mod(20*texCoord.x, 1.0) < 0.1 || mod(20*texCoord.y, 1.0) < 0.1)\n"
 		"       diffuse *= 0.5;\n"
-		//"   vec3 diffuse = vec3(0, texCoord.x, texCoord.y);\n"
 		"   output_color = diffuse * ( abs(1.2f * dot(normal, light1_dir)) + abs(0.3f * dot(normal, light2_dir)));\n"
 		"}\n"
 	);
