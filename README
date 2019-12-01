@@ -1,3 +1,5 @@
-Slightly modified version of the opengl example from the OpenVR project.
+Program for viewing the complex points of elliptic curves in VR.
 
-Intended to be a copy-pastable starter file for OpenVR apps.
+If you have Visual Studio 2019 and an HTC Vive on a Windows machine, it should be possible to compile and run the solution file.
+
+Feel free to contact the author at sebastian dot bozlee at colorado dot edu if you have any questions.
